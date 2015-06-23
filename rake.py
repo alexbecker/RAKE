@@ -160,8 +160,8 @@ def test():
     if debug: print(sortedKeywords)
 
     totalKeywords = len(sortedKeywords)
-    print sortedKeywords[0:(totalKeywords / 3)]
     if debug: print(totalKeywords)
+    print(sortedKeywords[0:(totalKeywords // 3)])
 
     rake = Rake("SmartStoplist.txt")
     keywords = rake.run(text)
