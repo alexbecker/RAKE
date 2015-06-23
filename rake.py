@@ -133,7 +133,7 @@ class Rake(object):
 
         keyword_candidates = generate_candidate_keyword_scores(phrase_list, word_scores)
 
-        sorted_keywords = sorted(keyword_candidates.iteritems(), key=operator.itemgetter(1), reverse=True)
+        sorted_keywords = sorted(keyword_candidates.items(), key=operator.itemgetter(1), reverse=True)
         return sorted_keywords
 
 
@@ -156,7 +156,7 @@ def test():
     keywordcandidates = generate_candidate_keyword_scores(phraseList, wordscores)
     if debug: print(keywordcandidates)
 
-    sortedKeywords = sorted(keywordcandidates.iteritems(), key=operator.itemgetter(1), reverse=True)
+    sortedKeywords = sorted(keywordcandidates.items(), key=operator.itemgetter(1), reverse=True)
     if debug: print(sortedKeywords)
 
     totalKeywords = len(sortedKeywords)
