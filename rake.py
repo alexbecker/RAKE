@@ -126,13 +126,9 @@ class Rake(object):
 
     def run(self, text):
         sentence_list = split_sentences(text)
-
         phrase_list = generate_candidate_keywords(sentence_list, self.__stop_words_pattern)
-
         word_scores = calculate_word_scores(phrase_list)
-
         keyword_candidates = generate_candidate_keyword_scores(phrase_list, word_scores)
-
         sorted_keywords = sorted(keyword_candidates.items(), key=operator.itemgetter(1), reverse=True)
         return sorted_keywords
 
