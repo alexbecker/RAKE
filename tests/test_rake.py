@@ -1,8 +1,12 @@
 import operator
 
+import pytest
+
 from rake import (
     Rake,
+    is_number,
     split_sentences,
+    load_stopword_list,
     calculate_word_scores,
     build_stop_word_regex,
     generate_candidate_keywords,
@@ -15,12 +19,9 @@ def test_rake():
 
     # Split text into sentences
     sentenceList = split_sentences(text)
-    # Fox stoplist contains "numbers", so it will not find "natural numbers" like in Table 1.1
-    # stoppath = "FoxStoplist.txt"
 
-    # SMART stoplist misses some of the lower-scoring keywords in Figure 1.5, which means that the top 1/3 cuts off one of the 4.0 score words in Table 1.1
-    stop_source = 'smart'
-    stopwordpattern = build_stop_word_regex(stop_source)
+    stopwords = load_stopword_list()
+    stopwordpattern = build_stop_word_regex(stopwords)
 
     # generate candidate keywords
     phraseList = generate_candidate_keywords(sentenceList, stopwordpattern)
@@ -39,6 +40,37 @@ def test_rake():
     print(totalKeywords)
     print(sortedKeywords[0:(totalKeywords // 3)])
 
-    rake = Rake(stop_source)
+    rake = Rake()
     keywords = rake.run(text)
     print(keywords)
+
+
+# SMART stoplist misses some of the lower-scoring keywords in Figure 1.5, which means that the top 1/3 cuts off one of the 4.0 score words in Table 1.1
+# Fox stoplist contains "numbers", so it will not find "natural numbers" like in Table 1.1
+@pytest.mark.parametrize('source', ['fox', 'smart'])
+def test_stopwords_loader(source):
+    stopwords = load_stopword_list(source)
+    assert stopwords
+    assert type(stopwords) in (list, tuple)
+
+
+def test_stopwords_loader_fails():
+    stopwords = None
+    with pytest.raises(ValueError):
+        stopwords = load_stopword_list('nonsense')
+    assert stopwords is None
+
+
+def test_is_number():
+    assert is_number(200)
+    assert is_number(200.00)
+    assert is_number(-200)
+    assert is_number(-200.00)
+    assert is_number('200')
+    assert is_number('200.00')
+    assert is_number('-200')
+    assert is_number('-200.00')
+
+    assert not is_number('My Cousin Vinny')
+    assert not is_number('200 + 0.00')
+    assert not is_number('My Cousin 2 Removed, Vinny')
