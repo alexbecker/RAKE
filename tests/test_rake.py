@@ -51,7 +51,7 @@ def test_rake():
 def test_stopwords_loader(source):
     stopwords = load_stopword_list(source)
     assert stopwords
-    assert type(stopwords) in (list, tuple)
+    assert isinstance(stopwords, (list, tuple))
 
 
 def test_stopwords_loader_fails():
