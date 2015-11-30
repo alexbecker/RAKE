@@ -1,0 +1,35 @@
+language: python
+python:
+  - '2.6'
+  - '2.7'
+  - '3.2'
+  - '3.3'
+  - '3.4'
+  - '3.5'
+
+install:
+  - pip install -r dev-requirements.txt
+  - pip install pytest-cov
+  - pip install coveralls
+
+before_script: flake8 .
+
+script:
+  py.test tests --cov-report term-missing --cov-config .coveragerc --cov rake
+
+after_success:
+  coveralls
+
+
+# Uncommenting and filling the TODOs will enable continuous integration
+# (on a succesful tagged build off master, the package will be uploaded to pypi)
+#
+# deploy:
+#   provider: pypi
+#   user: TODO
+#   password:
+#     secure: TODO
+#   on:
+#     tags: true
+#     repo: aneesha/rake
+#     branch: master
