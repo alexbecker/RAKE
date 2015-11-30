@@ -2,7 +2,7 @@ import operator
 
 import pytest
 
-from rake import (
+from .rake import (
     Rake,
     is_number,
     split_sentences,
