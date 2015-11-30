@@ -1,1 +1,1 @@
-from .rake import *
+from .rake import *  # noqa
