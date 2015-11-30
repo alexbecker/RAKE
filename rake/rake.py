@@ -10,6 +10,8 @@ import operator
 
 
 def is_number(s):
+    if isinstance(s, (float, int)):
+        return True
     try:
         float(s) if '.' in s else int(s)
         return True
@@ -43,13 +45,18 @@ def split_sentences(text):
     return sentences
 
 
-def build_stop_word_regex(stop_word_source='smart'):
-    if stop_word_source == 'smart':
+def load_stopword_list(source='smart'):
+    source = source.lower().strip()
+    if source == 'smart':
         from rake.SmartStoplist import stopwords
-    elif stop_word_source == 'fox':
+    elif source == 'fox':
         from rake.FoxStoplist import stopwords
     else:
-        raise ValueError('Stop word source {} not found'.format(stop_word_source))
+        raise ValueError('Stopword source {} not found'.format(source))
+    return stopwords
+
+
+def build_stop_word_regex(stopwords):
     stop_word_regex_list = []
     for word in stopwords:
         word_regex = r'\b' + word + r'(?![\w-])'  # added look ahead for hyphen
@@ -109,9 +116,9 @@ def generate_candidate_keyword_scores(phrase_list, word_score):
 
 
 class Rake(object):
-    def __init__(self, stop_words_source):
+    def __init__(self, stop_words_source='smart'):
         self.stop_words_source = stop_words_source
-        self.__stop_words_pattern = build_stop_word_regex(stop_words_source)
+        self.__stop_words_pattern = build_stop_word_regex(load_stopword_list(stop_words_source))
 
     def run(self, text):
         sentence_list = split_sentences(text)
