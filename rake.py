@@ -1,7 +1,7 @@
 # Implementation of RAKE - Rapid Automtic Keyword Exraction algorithm
 # as described in:
-# Rose, S., D. Engel, N. Cramer, and W. Cowley (2010). 
-# Automatic keyword extraction from indi-vidual documents. 
+# Rose, S., D. Engel, N. Cramer, and W. Cowley (2010).
+# Automatic keyword extraction from indi-vidual documents.
 # In M. W. Berry and J. Kogan (Eds.), Text Mining: Applications and Theory.unknown: John Wiley and Sons, Ltd.
 
 import re
