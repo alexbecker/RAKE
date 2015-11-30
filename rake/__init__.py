@@ -1,1 +1,1 @@
-from rake.rake import *
+from .rake import *

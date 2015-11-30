@@ -48,9 +48,9 @@ def split_sentences(text):
 def load_stopword_list(source='smart'):
     source = source.lower().strip()
     if source == 'smart':
-        from rake.SmartStoplist import stopwords
+        from .SmartStoplist import stopwords
     elif source == 'fox':
-        from rake.FoxStoplist import stopwords
+        from .FoxStoplist import stopwords
     else:
         raise ValueError('Stopword source {} not found'.format(source))
     return stopwords
