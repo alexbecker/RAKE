@@ -4,7 +4,7 @@ VERSION = '0.0.0'
 
 setup(
     name='pyrake',
-    packages='rake',
+    packages=['rake'],
     version=VERSION,
     description='A Python implementation of the RAKE keyword extraction algorithm',
     author='aneesha',
