@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 import re
 import operator
+from collections import defaultdict
 
 
 def is_number(s):
@@ -59,10 +60,11 @@ def load_stopword_list(source='smart'):
 
 
 def build_stop_word_regex(stopwords):
-    stop_word_regex_list = []
-    for word in stopwords:
-        word_regex = r'\b' + word + r'(?![\w-])'  # added look ahead for hyphen
-        stop_word_regex_list.append(word_regex)
+    #stop_word_regex_list = []
+    stop_word_regex_list = [r'\b' + word + r'(?![\w-])' for word in stopwords]
+    #for word in stopwords:
+    #    word_regex = r'\b' + word + r'(?![\w-])'  # added look ahead for hyphen
+    #    stop_word_regex_list.append(word_regex)
     stop_word_pattern = re.compile('|'.join(stop_word_regex_list), re.IGNORECASE)
     return stop_word_pattern
 
@@ -80,35 +82,34 @@ def generate_candidate_keywords(sentence_list, stopword_pattern):
 
 
 def calculate_word_scores(phraseList):
-    word_frequency = {}
-    word_degree = {}
+    word_frequency = defaultdict(int) #edited
+    word_degree = defaultdict(int) #edited
     for phrase in phraseList:
         word_list = separate_words(phrase, 0)
         word_list_length = len(word_list)
         word_list_degree = word_list_length - 1
         # if word_list_degree > 3: word_list_degree = 3 #exp.
         for word in word_list:
-            word_frequency.setdefault(word, 0)
+            #word_frequency.setdefault(word, 0)
             word_frequency[word] += 1
-            word_degree.setdefault(word, 0)
+            #word_degree.setdefault(word, 0)
             word_degree[word] += word_list_degree  # orig.
             # word_degree[word] += 1/(word_list_length*1.0) #exp.
     for item in word_frequency:
         word_degree[item] = word_degree[item] + word_frequency[item]
 
     # Calculate Word scores = deg(w)/frew(w)
-    word_score = {}
+    word_score = defaultdict(int)
     for item in word_frequency:
-        word_score.setdefault(item, 0)
+        # word_score.setdefault(item, 0)
         word_score[item] = word_degree[item] / (word_frequency[item] * 1.0)  # orig.
     # word_score[item] = word_frequency[item]/(word_degree[item] * 1.0) #exp.
     return word_score
 
 
 def generate_candidate_keyword_scores(phrase_list, word_score):
-    keyword_candidates = {}
+    keyword_candidates = defaultdict(int)
     for phrase in phrase_list:
-        keyword_candidates.setdefault(phrase, 0)
         word_list = separate_words(phrase, 0)
         candidate_score = 0
         for word in word_list:
@@ -118,11 +119,30 @@ def generate_candidate_keyword_scores(phrase_list, word_score):
 
 
 class Rake(object):
+    """Extract keywords from a document using the Rapid Automtic Keyword Exraction (RAKE) algorithm.
+
+    Parameters
+    ----------
+    stop_words_source : string {'smart', 'fox'}, default='smart'
+        If 'smart' uses stop word list from SMART (Salton 1971). len=571
+        If 'fox' uses , Fox’s stop word list (Fox 1989). len=425
+    """
     def __init__(self, stop_words_source='smart'):
         self.stop_words_source = stop_words_source
         self.__stop_words_pattern = build_stop_word_regex(load_stopword_list(stop_words_source))
 
     def run(self, text):
+        """Runs the RAKE algorithm on `text`
+
+        Parameters
+        ----------
+        text : string
+            A string object containing the text for keyword extraction
+
+        Returns
+        -------
+        sorted_keywords : list of tuples, len=n_keywords
+        """
         sentence_list = split_sentences(text)
         phrase_list = generate_candidate_keywords(sentence_list, self.__stop_words_pattern)
         word_scores = calculate_word_scores(phrase_list)
