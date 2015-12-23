@@ -127,7 +127,7 @@ class Rake(object):
         If 'smart' uses stop word list from SMART (Salton 1971). len=571
         If 'fox' uses , Fox’s stop word list (Fox 1989). len=425
     """
-    def __init__(self, stop_words_source='smart'):
+    def __init__(self, stop_words_source='fox'):
         self.stop_words_source = stop_words_source
         self.__stop_words_pattern = build_stop_word_regex(load_stopword_list(stop_words_source))
 
