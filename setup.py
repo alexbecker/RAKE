@@ -1,16 +1,16 @@
 from setuptools import setup
 
-VERSION = '0.0.0'
+VERSION = '0.1.0'
 
 setup(
     name='pyrake',
     packages=['rake'],
     version=VERSION,
     description='A Python implementation of the RAKE keyword extraction algorithm',
-    author='aneesha',
+    author='pmbaumgartner',
     author_email='TODO',  # TODO
-    url='https://github.com/aneesha/rake',
-    download_url='https://github.com/aneesha/rake/tarball/{}'.format(VERSION),
+    url='https://github.com/pmbaumgartner/rake',
+    download_url='https://github.com/pmbaumgartner/rake/tarball/{}'.format(VERSION),
     install_requires=[],
     license='MIT',
     classifiers=[
