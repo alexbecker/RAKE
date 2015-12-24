@@ -28,12 +28,21 @@ class Rake(object):
 
 	Parameters
 	----------
-	stop_words_source : string {'smart', 'fox'}, default='fox'
+	stop_words_source : string {'fox', 'smart'}, default='fox'
 		If 'fox' uses , Fox’s stop word list (Fox 1989). len=425
 		If 'smart' uses stop word list from SMART (Salton 1971). len=571
+
+	Attributes
+	----------
+	word_scores : list of word scores as namedtuples,
+	in descending order of score (deg(w) / freq(w))
+		must call `run` first
+	keyword_scores : list of keyword scores as namedtuples,
+	in descending order of score (sum of word scores)
+		must call `run` first
 	"""
 	def __init__(self, stop_words_source='fox'):
-		#self.stop_words_source = stop_words_source
+		self.stop_words_source = stop_words_source
 		self.phrase_delimiters = [i for i in punctuation]
 		self.word_delimiters = [i for i in whitespace]
 		self.word_scores = "Call `run` to calculate word scores"
@@ -52,38 +61,54 @@ class Rake(object):
 
 
 	def _generate_candidate_keywords(self, text, stopwords):
-		keywords = []
-		phrase_builder = []
+	    keywords = []
+	    phrase_builder = []
+	    if isinstance(text, list):
+	        word_array = text
+	    elif isinstance(text, str):
+	        word_array = re.split(r'|'.join(self.word_delimiters), text)
+	    else:
+	        return "Not tokenized list or text"
 
-		word_array = re.split(r'|'.join(self.word_delimiters), text)
 
-		# newlines are split into tokens, remove them
-		word_array = [word for word in word_array if word]
+	    # newlines are split into tokens
+	    word_array = [word for word in word_array if word]
 
-		for token in word_array:
-			word = token.lower()
+	    for token in word_array:
+	        word = token.lower()
 
-			punct_flag = word[-1] in self.phrase_delimiters
-			nonempty_flag = phrase_builder != []
+	        # newlines appear as tokens
+	        #if not token:
+	        #    continue
 
-			if punct_flag:
-				word = word[:-1]
+	        punct_suffix = word[-1] in self.phrase_delimiters
+			punct_prefix = word[0] in self.phrase_delimiters
+			punct_flag = punct_suffix or punct_prefix
+	        nonempty_flag = phrase_builder != []
 
-			stopword_flag = word in stopwords
+	        if punct_suffix:
+	            word = word[:-1]
+			elif punct_prefix:
+				word = word[1:]
 
-			if not stopword_flag and not punct_flag:
-				phrase_builder.append(word)
-			elif stopword_flag and nonempty_flag:
-				phrase = ' '.join(phrase_builder)
-				keywords.append(phrase)
-				phrase_builder = []
-			elif punct_flag and nonempty_flag:
-				phrase_builder.append(word)
-				phrase = ' '.join(phrase_builder)
-				keywords.append(phrase)
-				phrase_builder = []
+	        stopword_flag = word in stopwords
 
-		return keywords
+	        #print(token, punct_flag, stopword_flag, nonempty_flag)
+
+	        if not stopword_flag and not punct_flag:
+	            phrase_builder.append(word)
+	        elif stopword_flag and nonempty_flag:
+	            phrase = ' '.join(phrase_builder)
+	            keywords.append(phrase)
+	            phrase_builder = []
+	        elif punct_flag and nonempty_flag and not stopword_flag:
+	            phrase_builder.append(word)
+	            phrase = ' '.join(phrase_builder)
+	            keywords.append(phrase.strip())
+	            phrase_builder = []
+
+
+	    return keywords
 
 	def _calculate_word_scores(self, candidate_keywords):
 		freq_counter = Counter()
@@ -107,7 +132,6 @@ class Rake(object):
 			word_scores.append(word_tuple)
 
 		sorted_word_scores = sorted(word_scores, key=lambda x: x.score, reverse=True)
-
 
 		self.word_scores = sorted_word_scores
 
@@ -142,9 +166,9 @@ class Rake(object):
 
 		Returns
 		-------
-		sorted_keywords : list of tuples, len=n_keywords
+		sorted_keywords : list of namedtuples, len=n_keywords
 		"""
-		stopwords = self._load_stopword_list(source='fox')
+		stopwords = self._load_stopword_list(source=self.stop_words_source)
 		candidate_keywords = self._generate_candidate_keywords(text, stopwords)
 
 		word_scores = self._calculate_word_scores(candidate_keywords)
