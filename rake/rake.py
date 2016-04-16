@@ -78,8 +78,8 @@ class Rake(object):
 
             if punct_suffix:
                 word = word[:-1]
-                    elif punct_prefix:
-                        word = word[1:]
+                elif punct_prefix:
+                    word = word[1:]
 
             stopword_flag = word in stopwords
 
