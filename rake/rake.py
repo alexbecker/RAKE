@@ -72,8 +72,8 @@ class Rake(object):
             #    continue
 
             punct_suffix = word[-1] in self.phrase_delimiters
-                punct_prefix = word[0] in self.phrase_delimiters
-                punct_flag = punct_suffix or punct_prefix
+            punct_prefix = word[0] in self.phrase_delimiters
+            punct_flag = punct_suffix or punct_prefix
             nonempty_flag = phrase_builder != []
 
             if punct_suffix:
